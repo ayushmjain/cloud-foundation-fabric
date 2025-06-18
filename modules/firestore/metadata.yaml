@@ -1,0 +1,118 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: blueprints.cloud.google.com/v1alpha1
+kind: BlueprintMetadata
+metadata:
+  name: firestore
+  annotations:
+    config.kubernetes.io/local-config: "true"
+spec:
+  info:
+    title: firestore
+    source:
+      repo: https://github.com/ayushmjain/cloud-foundation-fabric.git
+      dir: /modules/firestore
+      sourceType: git
+    description: {}
+    version: 1.0.0
+  content: {}
+  interfaces:
+    variables:
+      - name: backup_schedule
+        description: Backup schedule.
+        varType: |-
+          object({
+              retention         = string
+              daily_recurrence  = optional(bool, false)
+              weekly_recurrence = optional(string)
+            })
+      - name: database
+        description: Database attributes.
+        varType: |-
+          object({
+              app_engine_integration_mode       = optional(string)
+              concurrency_mode                  = optional(string)
+              deletion_policy                   = optional(string)
+              delete_protection_state           = optional(string)
+              kms_key_name                      = optional(string)
+              location_id                       = optional(string)
+              name                              = string
+              point_in_time_recovery_enablement = optional(string)
+              type                              = optional(string)
+            })
+        required: true
+      - name: database_create
+        description: Flag indicating whether the database should be created of not.
+        varType: string
+        defaultValue: true
+      - name: documents
+        description: Documents.
+        varType: |-
+          map(object({
+              collection  = string
+              document_id = string
+              fields      = any
+            }))
+        defaultValue: {}
+      - name: fields
+        description: Fields.
+        varType: |-
+          map(object({
+              collection = string
+              field      = string
+              indexes = optional(list(object({
+                query_scope  = optional(string)
+                order        = optional(string)
+                array_config = optional(string)
+              })))
+              ttl_config = optional(bool, false)
+            }))
+        defaultValue: {}
+      - name: indexes
+        description: Indexes.
+        varType: |-
+          map(object({
+              api_scope  = optional(string)
+              collection = string
+              fields = list(object({
+                field_path   = optional(string)
+                order        = optional(string)
+                array_config = optional(string)
+                vector_config = optional(object({
+                  dimension = optional(number)
+                  flat      = optional(bool)
+                }))
+              }))
+              query_scope = optional(string)
+            }))
+        defaultValue: {}
+      - name: project_id
+        description: Project id.
+        varType: string
+        required: true
+    outputs:
+      - name: firestore_database
+        description: Firestore database.
+      - name: firestore_document_ids
+        description: Firestore document ids.
+      - name: firestore_documents
+        description: Firestore documents.
+      - name: firestore_field_ids
+        description: Firestore field ids.
+      - name: firestore_fields
+        description: Firestore fields.
+      - name: firestore_index_ids
+        description: Firestore index ids.
+      - name: firestore_indexes
+        description: Firestore indexes.
